@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grocery Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: calc(100% - 10px);
+            margin-bottom: 10px;
+            padding: 5px;
+        }
+
+        button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .grocery-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f2f2f2;
+            border-radius: 5px;
+        }
+
+        .grocery-item input[type="checkbox"] {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Grocery Management System</h1>
+        <form id="addGroceryForm">
+            <input type="text" id="itemName" placeholder="Item name" required>
+            <input type="number" id="itemPrice" placeholder="Price" min="0.01" step="0.01" required>
+            <input type="number" id="itemQuantity" placeholder="Quantity" min="1" required>
+            <button type="submit">Add Item</button>
+        </form>
+        <div id="groceryList">
+            <!-- Grocery items will be dynamically added here -->
+        </div>
+    </div>
+    <script>
+        let groceryItems = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const addGroceryForm = document.getElementById('addGroceryForm');
+
+            addGroceryForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const itemName = document.getElementById('itemName').value;
+                const itemPrice = parseFloat(document.getElementById('itemPrice').value);
+                const itemQuantity = parseInt(document.getElementById('itemQuantity').value);
+
+                if (itemName && itemPrice && itemQuantity) {
+                    addGroceryItem(itemName, itemPrice, itemQuantity);
+                    addGroceryForm.reset();
+                } else {
+                    alert('Please fill in all fields.');
+                }
+            });
+
+            loadGroceryItems();
+        });
+
+        function addGroceryItem(name, price, quantity) {
+            const newItem = { name, price, quantity };
+            groceryItems.push(newItem);
+            displayGroceryItems();
+        }
+
+        function displayGroceryItems() {
+            const groceryList = document.getElementById('groceryList');
+            groceryList.innerHTML = '';
+            groceryItems.forEach((item, index) => {
+                const groceryItemDiv = document.createElement('div');
+                groceryItemDiv.classList.add('grocery-item');
+                groceryItemDiv.innerHTML = `
+                    <input type="checkbox" data-index="${index}">
+                    <span>${item.name} - $${item.price} - ${item.quantity} pcs</span>
+                    <button onclick="sellItem(${index})">Sell</button>
+                    <button onclick="buyItem(${index})">Buy</button>
+                `;
+                groceryList.appendChild(groceryItemDiv);
+            });
+        }
+
+        function sellItem(index) {
+            groceryItems[index].quantity--;
+            if (groceryItems[index].quantity <= 0) {
+                groceryItems.splice(index, 1);
+            }
+            displayGroceryItems();
+        }
+
+        function buyItem(index) {
+            groceryItems[index].quantity++;
+            displayGroceryItems();
+        }
+
+        function loadGroceryItems() {
+            // Here you can load grocery items from a database or local storage if available
+            // For this example, we initialize an empty array
+            // groceryItems = localStorage.getItem('groceryItems') ? JSON.parse(localStorage.getItem('groceryItems')) : [];
+            displayGroceryItems();
+        }
+
+        // Save grocery items to local storage whenever groceryItems array changes
+        // You can uncomment this code if you want to save grocery items to local storage
+        // function saveGroceryItems() {
+        //     localStorage.setItem('groceryItems', JSON.stringify(groceryItems));
+        // }
+        // window.addEventListener('unload', saveGroceryItems);
+    </script>
+</body>
+</html>
